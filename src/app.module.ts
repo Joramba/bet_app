@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
+import { MatchesModule } from './modules/matches/matches.module';
+import { ScraperModule } from './modules/scraper/scraper.module';
+import { PrismaService } from './common/prisma.service';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [ConfigModule.forRoot(), MatchesModule, ScraperModule],
+  providers: [PrismaService],
 })
 export class AppModule {}
