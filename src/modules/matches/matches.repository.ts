@@ -22,11 +22,6 @@ export class MatchesRepository {
 
   async findMatches(): Promise<Match[]> {
     return this.prisma.match.findMany({
-      where: {
-        date: {
-          gte: new Date(),
-        },
-      },
       include: { odds: true },
     });
   }
@@ -34,9 +29,6 @@ export class MatchesRepository {
   async findMatchesByLeague(league: string): Promise<Match[]> {
     return this.prisma.match.findMany({
       where: {
-        date: {
-          gte: new Date(),
-        },
         league,
       },
       include: { odds: true },

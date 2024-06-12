@@ -67,7 +67,6 @@ export class ScraperService implements OnModuleInit {
 
       for (let index = 0; index < matchElements.length; index++) {
         const element = matchElements[index];
-        const date = new Date();
 
         let parentLeagueHeader = $(element).closest('.wclLeagueHeader');
         if (parentLeagueHeader.length === 0) {
@@ -134,6 +133,10 @@ export class ScraperService implements OnModuleInit {
         const matchPage = cheerio.load(matchPageContent);
 
         const odds = [];
+
+        const dateText = matchPage('.duelParticipant__startTime').text().trim();
+        const date = this.parseDate(dateText);
+
         matchPage('.oddsRowContent').each((i, el) => {
           const bookmaker =
             matchPage(el).find('.bookmaker a').attr('title')?.trim() ||
@@ -195,5 +198,13 @@ export class ScraperService implements OnModuleInit {
     } catch (error) {
       this.logger.error('Error while scraping odds', error);
     }
+  }
+
+  parseDate(dateString: string): Date {
+    const [datePart, timePart] = dateString.split(' ');
+    const [day, month, year] = datePart.split('.').map(Number);
+    const [hours, minutes] = timePart.split(':').map(Number);
+
+    return new Date(year, month - 1, day, hours, minutes);
   }
 }
