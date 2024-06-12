@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Query, Ip } from '@nestjs/common';
 import { MatchesService } from './matches.service';
 import { CreateMatchDto } from './dto/create-match.dto';
-import { MyLoggerService } from 'src/my-logger/my-logger.service';
+import { LoggerService } from '../logger/logger.service';
 
 @Controller('matches')
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
-  private readonly logger = new MyLoggerService(MatchesController.name);
+  private readonly logger = new LoggerService(MatchesController.name);
 
   @Post()
   async createMatch(@Ip() ip: string, @Body() createMatchDto: CreateMatchDto) {

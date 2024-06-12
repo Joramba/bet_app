@@ -4,20 +4,20 @@ import { promises as fsPromises } from 'fs';
 import * as path from 'path';
 
 @Injectable()
-export class MyLoggerService extends ConsoleLogger {
+export class LoggerService extends ConsoleLogger {
   async logToFile(entry) {
-    const formattedEntry = `${Intl.DateTimeFormat('en-US', {
+    const formattedEntry = `${Intl.DateTimeFormat('pl-PL', {
       dateStyle: 'short',
-      timeStyle: 'short',
-      timeZone: 'America/Chicago',
+      timeStyle: 'medium',
+      timeZone: 'Europe/Warsaw',
     }).format(new Date())}\t${entry}\n`;
 
     try {
-      if (!fs.existsSync(path.join(__dirname, '..', '..', 'logs'))) {
-        await fsPromises.mkdir(path.join(__dirname, '..', '..', 'logs'));
+      if (!fs.existsSync(path.join(__dirname, '..', '..', '..', 'logs'))) {
+        await fsPromises.mkdir(path.join(__dirname, '..', '..', '..', 'logs'));
       }
       await fsPromises.appendFile(
-        path.join(__dirname, '..', '..', 'logs', 'myLogFile.log'),
+        path.join(__dirname, '..', '..', '..', 'logs', 'logFile.log'),
         formattedEntry,
       );
     } catch (e) {

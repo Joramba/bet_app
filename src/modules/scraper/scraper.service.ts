@@ -2,11 +2,11 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import * as puppeteer from 'puppeteer';
 import { PrismaService } from '../../common/prisma.service';
-import { MyLoggerService } from 'src/my-logger/my-logger.service';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class ScraperService implements OnModuleInit {
-  private readonly logger = new MyLoggerService(ScraperService.name);
+  private readonly logger = new LoggerService(ScraperService.name);
 
   constructor(private readonly prisma: PrismaService) {}
 
