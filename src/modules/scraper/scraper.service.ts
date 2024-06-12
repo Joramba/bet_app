@@ -1,11 +1,12 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import * as puppeteer from 'puppeteer';
 import { PrismaService } from '../../common/prisma.service';
+import { MyLoggerService } from 'src/my-logger/my-logger.service';
 
 @Injectable()
 export class ScraperService implements OnModuleInit {
-  private readonly logger = new Logger(ScraperService.name);
+  private readonly logger = new MyLoggerService(ScraperService.name);
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -20,8 +21,11 @@ export class ScraperService implements OnModuleInit {
 
       await this.prisma
         .$executeRaw`TRUNCATE TABLE "Odds" RESTART IDENTITY CASCADE`;
+      this.logger.log(`Clear data from table 'Odds'`, ScraperService.name);
+
       await this.prisma
         .$executeRaw`TRUNCATE TABLE "Match" RESTART IDENTITY CASCADE`;
+      this.logger.log(`Clear data from table 'Match'`, ScraperService.name);
 
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
@@ -29,7 +33,6 @@ export class ScraperService implements OnModuleInit {
         waitUntil: 'networkidle2',
       });
 
-      // Нажать на кнопку "Następne"
       await page.evaluate(() => {
         const xpath = "//div[contains(text(), 'Następne')]";
         const result = document.evaluate(
@@ -47,7 +50,6 @@ export class ScraperService implements OnModuleInit {
         }
       });
 
-      // Развернуть все события
       await page.evaluate(() => {
         const buttons = document.querySelectorAll('button');
         buttons.forEach((button) => {
@@ -98,8 +100,6 @@ export class ScraperService implements OnModuleInit {
         const guest = $(element).find('.event__awayParticipant').text().trim();
 
         const league = `${leagueRegion} ${leagueName}`;
-
-        this.logger.log(`league: ${league}, Host: ${host}, Guest: ${guest}`);
 
         const [newPage] = await Promise.all([
           new Promise<puppeteer.Page>((resolve) =>
@@ -178,6 +178,11 @@ export class ScraperService implements OnModuleInit {
           }
         });
 
+        this.logger.log(
+          `Create new match: League: ${league}, Host: ${host}, Guest: ${guest}'`,
+          ScraperService.name,
+        );
+
         await this.prisma.match.create({
           data: {
             date,
@@ -194,9 +199,9 @@ export class ScraperService implements OnModuleInit {
         await newPage.close();
       }
 
-      this.logger.log('Scraping completed successfully');
+      this.logger.log('Scraping completed successfully', ScraperService.name);
     } catch (error) {
-      this.logger.error('Error while scraping odds', error);
+      this.logger.error('Error while scraping odds', ScraperService.name);
     }
   }
 

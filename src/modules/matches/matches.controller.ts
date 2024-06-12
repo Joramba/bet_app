@@ -1,21 +1,30 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Ip } from '@nestjs/common';
 import { MatchesService } from './matches.service';
 import { CreateMatchDto } from './dto/create-match.dto';
+import { MyLoggerService } from 'src/my-logger/my-logger.service';
 
 @Controller('matches')
 export class MatchesController {
   constructor(private readonly matchesService: MatchesService) {}
+  private readonly logger = new MyLoggerService(MatchesController.name);
 
   @Post()
-  async createMatch(@Body() createMatchDto: CreateMatchDto) {
+  async createMatch(@Ip() ip: string, @Body() createMatchDto: CreateMatchDto) {
+    this.logger.log(`Create new match\t${ip}`, MatchesController.name);
     return this.matchesService.createMatch(createMatchDto);
   }
 
   @Get()
-  async getMatches(@Query('league') league: string) {
+  async getMatches(@Ip() ip: string, @Query('league') league: string) {
     if (league) {
+      this.logger.log(
+        `Request for matches by ${league} league\t${ip}`,
+        MatchesController.name,
+      );
       return this.matchesService.getMatchesByLeague(league);
     }
+
+    this.logger.log(`Request for all matches\t${ip}`, MatchesController.name);
     return this.matchesService.getMatches();
   }
 }
