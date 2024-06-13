@@ -39,9 +39,19 @@ export class MatchesService {
       };
     }
 
+    const seenMatchIds = new Set<number>();
+
     let akoOdds = 1;
 
     for (const selection of selections) {
+      if (seenMatchIds.has(selection.matchId)) {
+        return {
+          flag: null,
+          message: `Multiple selections on match with ID ${selection.matchId} are not allowed.`,
+          statusCode: 400,
+        };
+      }
+
       const match = matches.find((m) => m.id === selection.matchId);
 
       if (!match) {
@@ -71,6 +81,7 @@ export class MatchesService {
       }
 
       akoOdds *= odds;
+      seenMatchIds.add(selection.matchId);
     }
 
     return akoOdds;
