@@ -137,6 +137,15 @@ export class ScraperService implements OnModuleInit {
         const dateText = matchPage('.duelParticipant__startTime').text().trim();
         const date = this.parseDate(dateText);
 
+        if (date <= new Date()) {
+          this.logger.log(
+            `Skipping match: League: ${league}, Host: ${host}, Guest: ${guest} because it has already started or finished.`,
+            ScraperService.name,
+          );
+          await newPage.close();
+          continue;
+        }
+
         matchPage('.oddsRowContent').each((i, el) => {
           const bookmaker =
             matchPage(el).find('.bookmaker a').attr('title')?.trim() ||
@@ -146,6 +155,7 @@ export class ScraperService implements OnModuleInit {
             .find('.cell.o_1 .oddsValueInner')
             .text()
             .trim();
+
           const homeWin = parseFloat(homeWinText);
           const validHomeWin = isNaN(homeWin) ? null : homeWin;
 

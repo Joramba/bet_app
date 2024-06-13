@@ -20,18 +20,29 @@ export class MatchesRepository {
     return createdMatch;
   }
 
-  async findMatches(): Promise<Match[]> {
+  async findMatches(): Promise<MatchWithOdds[]> {
     return this.prisma.match.findMany({
       include: { odds: true },
     });
   }
 
-  async findMatchesByLeague(league: string): Promise<Match[]> {
+  async findMatchesByLeague(league: string): Promise<MatchWithOdds[]> {
     return this.prisma.match.findMany({
       where: {
         league,
       },
       include: { odds: true },
+    });
+  }
+
+  async findMatchesByIds(matchIds: number[]): Promise<MatchWithOdds[]> {
+    return this.prisma.match.findMany({
+      where: {
+        id: {
+          in: matchIds,
+        },
+      },
+      include: { odds: true }, 
     });
   }
 }
