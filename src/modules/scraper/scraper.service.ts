@@ -115,6 +115,7 @@ export class ScraperService implements OnModuleInit {
               index
             ] as HTMLElement;
             if (link) {
+              console.log(link);
               link.click();
             }
           }, index),
@@ -127,6 +128,7 @@ export class ScraperService implements OnModuleInit {
 
         await newPage.bringToFront();
         await newPage.waitForSelector('.oddsRowContent', { timeout: 60000 });
+        console.log(`Opened new page for ${index}`);
 
         const matchPageContent = await newPage.content();
 

@@ -4,6 +4,6 @@ import { DatabaseModule } from '../database/database.module';
 
 @Module({
   imports: [DatabaseModule],
-  // providers: [ScraperService],
+  providers: [ScraperService],
 })
 export class ScraperModule {}
