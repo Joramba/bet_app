@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Match, Odds } from '@prisma/client';
+import { Match } from '@prisma/client';
 import { PrismaService } from '../../common/prisma.service';
 
 @Injectable()
@@ -42,7 +42,7 @@ export class MatchesRepository {
           in: matchIds,
         },
       },
-      include: { odds: true }, 
+      include: { odds: true },
     });
   }
 }
