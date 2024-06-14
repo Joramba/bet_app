@@ -1,36 +1,31 @@
-<<<<<<< HEAD
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## Bets App
+* REST API server with endpoints that allows:
+  * Downloading the history of pre-match odds available at bookmakers for today's
+upcoming matches (i.e., those that have not yet started).
+  * Calculation of the resulting single/ako betting odds for selected matches.
+* Scraper for Flashscore.pl which:
+  * Retrieves current bookmaker odds for today's matches not started and saves them
+to the database (every 30 minutes)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
 
+Install docker container:
+
 ```bash
-$ npm install
+docker-compose up --build
+```
+
+Create Data Base using Prisma:
+
+```bash
+npx prisma migrate dev --name init
+npx prisma generate
+```
+
+Install dependencies:
+```bash
+npm install
 ```
 
 ## Running the app
@@ -46,32 +41,168 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+# Matches API Documentation
+This API provides endpoints to manage and calculate odds for matches. Below are the available endpoints along with their usage examples.
+
+## Endpoints
+1. Create a Match
+Endpoint: POST /matches
+
+Description: Create a new match with odds.
+
+Request Body:
+
+```bash
+{
+  "date": "2024-06-14T18:00:00.000Z",
+  "league": "Test League",
+  "host": "Team A",
+  "guest": "Team B",
+  "odds": [
+    {
+      "bookmaker": "Bookie1",
+      "homeWin": 1.5,
+      "draw": 3.5,
+      "awayWin": 2.5
+    }
+  ]
+}
+```
+
+Response:
+```bash
+{
+  "id": 1,
+  "date": "2024-06-14T18:00:00.000Z",
+  "league": "Test League",
+  "host": "Team A",
+  "guest": "Team B",
+  "createdAt": "2024-06-14T18:00:00.000Z",
+  "updatedAt": "2024-06-14T18:00:00.000Z",
+  "odds": [
+    {
+      "id": 1,
+      "matchId": 1,
+      "bookmaker": "Bookie1",
+      "homeWin": 1.5,
+      "draw": 3.5,
+      "awayWin": 2.5,
+      "createdAt": "2024-06-14T18:00:00.000Z",
+      "updatedAt": "2024-06-14T18:00:00.000Z"
+    }
+  ]
+}
+```
+
+2. Get Matches
+Endpoint: GET /matches
+
+Description: Retrieve all matches. You can filter matches by league.
+
+Query Parameters:
+
+* league (optional): Filter matches by league name.
+Example Request:
+```bash
+  GET /matches?league=Test%20League
+```
+
+Response: 
+```bash
+[
+  {
+    "id": 1,
+    "date": "2024-06-14T18:00:00.000Z",
+    "league": "Test League",
+    "host": "Team A",
+    "guest": "Team B",
+    "createdAt": "2024-06-14T18:00:00.000Z",
+    "updatedAt": "2024-06-14T18:00:00.000Z",
+    "odds": [
+      {
+        "id": 1,
+        "matchId": 1,
+        "bookmaker": "Bookie1",
+        "homeWin": 1.5,
+        "draw": 3.5,
+        "awayWin": 2.5,
+        "createdAt": "2024-06-14T18:00:00.000Z",
+        "updatedAt": "2024-06-14T18:00:00.000Z"
+      }
+    ]
+  }
+]
+```
+
+3. Calculate AKO Odds
+Endpoint: POST /matches/calculate-ako-odds
+
+Description: Calculate the AKO (Accumulative) odds for selected matches.
+
+Request Body:
+```bash
+{
+  "selections": [
+    {
+      "matchId": 1,
+      "betType": "homeWin"
+    },
+    {
+      "matchId": 2,
+      "betType": "draw"
+    }
+  ]
+}
+```
+
+Response:
+```bash
+{
+  "statusCode": 200,
+  "odds": 5.25
+}
+```
+
+Error Responses: 
+
+* If no matches found for the given IDs:
+```bash
+{
+  "flag": null,
+  "message": "No matches found for the given IDs.",
+  "statusCode": 404
+}
+```
+
+* If multiple selections on the same match are not allowed:
+```bash
+{
+  "flag": null,
+  "message": "Multiple selections on match with ID 1 are not allowed.",
+  "statusCode": 400
+}
+```
+
+* if no odds available for a match:
+```bash
+{
+  "flag": null,
+  "message": "No odds available for match with ID 1.",
+  "statusCode": 404
+}
+```
+* If odds not available for the selected bet type:
+```bash
+{
+  "flag": null,
+  "message": "Odds not available for the selected bet type in match with ID 1.",
+  "statusCode": 400
+}
+```
+
 ## Test
 
 ```bash
 # unit tests
 $ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
-=======
-# bet_app
->>>>>>> e6d504b0282ea55aefb8b6624aadc60cf6ede5b0
