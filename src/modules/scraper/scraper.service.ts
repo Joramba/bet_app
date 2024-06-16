@@ -11,7 +11,7 @@ export class ScraperService implements OnModuleInit {
   constructor(private readonly prisma: PrismaService) {}
 
   async onModuleInit() {
-    await this.scrapeOdds();
+    // await this.scrapeOdds();
   }
 
   async scrapeOdds() {
@@ -101,6 +101,8 @@ export class ScraperService implements OnModuleInit {
 
         const league = `${leagueRegion} ${leagueName}`;
 
+        console.log(`league ${league}`);
+
         const [newPage] = await Promise.all([
           new Promise<puppeteer.Page>((resolve) =>
             browser.once('targetcreated', async (target) => {
@@ -114,6 +116,8 @@ export class ScraperService implements OnModuleInit {
             const link = document.querySelectorAll('.event__match a')[
               index
             ] as HTMLElement;
+            console.log(`Link: ${link[index]}`);
+
             if (link) {
               console.log(link);
               link.click();
@@ -127,7 +131,7 @@ export class ScraperService implements OnModuleInit {
         }
 
         await newPage.bringToFront();
-        await newPage.waitForSelector('.oddsRowContent', { timeout: 60000 });
+        await newPage.waitForSelector('.oddsRowContent', { timeout: 5000 });
         console.log(`Opened new page for ${index}`);
 
         const matchPageContent = await newPage.content();

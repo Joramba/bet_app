@@ -4,9 +4,16 @@ import { MatchesController } from './matches.controller';
 import { MatchesRepository } from './matches.repository';
 import { DatabaseModule } from '../database/database.module';
 import { PrismaService } from 'src/common/prisma.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    DatabaseModule,
+    CacheModule.register({
+      ttl: 60,
+      max: 100,
+    }),
+  ],
   controllers: [MatchesController],
   providers: [MatchesService, MatchesRepository, PrismaService],
   exports: [MatchesService, MatchesRepository],
