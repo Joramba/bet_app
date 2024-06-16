@@ -16,16 +16,23 @@ Install docker container:
 docker-compose up --build
 ```
 
-Create Data Base using Prisma:
-
+Create .env with DATABASE_URL e.g.:
 ```bash
-npx prisma migrate dev --name init
-npx prisma generate
+DATABASE_URL="postgresql://postgres:admin@localhost:5432/bet_app?schema=public"
 ```
 
 Install dependencies:
 ```bash
 npm install
+```
+
+Create Data Base using Prisma:
+
+```bash
+npx prisma migrate dev --name init
+```
+```bash
+npx prisma generate
 ```
 
 ## Running the app
