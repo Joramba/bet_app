@@ -1,23 +1,28 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import * as cheerio from 'cheerio';
 import * as puppeteer from 'puppeteer';
 import { PrismaService } from '../../common/prisma.service';
 import { LoggerService } from '../logger/logger.service';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class ScraperService implements OnModuleInit {
   private readonly logger = new LoggerService(ScraperService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async onModuleInit() {
-    // await this.scrapeOdds();
+    await this.scrapeOdds();
   }
 
   async scrapeOdds() {
     try {
       await this.prisma.odds.deleteMany({});
       await this.prisma.match.deleteMany({});
+      await this.cacheManager.reset();
 
       await this.prisma
         .$executeRaw`TRUNCATE TABLE "Odds" RESTART IDENTITY CASCADE`;
@@ -101,8 +106,6 @@ export class ScraperService implements OnModuleInit {
 
         const league = `${leagueRegion} ${leagueName}`;
 
-        console.log(`league ${league}`);
-
         const [newPage] = await Promise.all([
           new Promise<puppeteer.Page>((resolve) =>
             browser.once('targetcreated', async (target) => {
@@ -132,7 +135,6 @@ export class ScraperService implements OnModuleInit {
 
         await newPage.bringToFront();
         await newPage.waitForSelector('.oddsRowContent', { timeout: 5000 });
-        console.log(`Opened new page for ${index}`);
 
         const matchPageContent = await newPage.content();
 
