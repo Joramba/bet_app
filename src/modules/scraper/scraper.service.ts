@@ -107,19 +107,23 @@ export class ScraperService implements OnModuleInit {
         const league = `${leagueRegion} ${leagueName}`;
 
         const [newPage] = await Promise.all([
-          new Promise<puppeteer.Page>((resolve) =>
-            browser.once('targetcreated', async (target) => {
+          new Promise<puppeteer.Page>((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error('Timed out waiting for target creation'));
+            }, 10000);
+
+            browser.on('targetcreated', async (target) => {
               const page = await target.page();
               if (page) {
+                clearTimeout(timeout);
                 resolve(page);
               }
-            }),
-          ),
+            });
+          }),
           page.evaluate((index) => {
             const link = document.querySelectorAll('.event__match a')[
               index
             ] as HTMLElement;
-
             if (link) {
               link.click();
             }
