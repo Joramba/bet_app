@@ -16,7 +16,7 @@ Install docker container:
 docker-compose up --build
 ```
 
-Create .env with DATABASE_URL e.g.:
+Create .env file with DATABASE_URL e.g.:
 ```bash
 DATABASE_URL="postgresql://postgres:admin@localhost:5432/bet_app?schema=public"
 ```
@@ -43,9 +43,6 @@ $ npm run start
 
 # watch mode
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
 # Matches API Documentation
