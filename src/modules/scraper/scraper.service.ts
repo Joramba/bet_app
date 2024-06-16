@@ -128,6 +128,8 @@ export class ScraperService implements OnModuleInit {
           }, index),
         ]);
 
+        console.log(newPage);
+
         if (!newPage) {
           this.logger.error(`Failed to open new page for match index ${index}`);
           continue;

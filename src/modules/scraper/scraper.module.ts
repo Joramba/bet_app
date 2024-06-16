@@ -2,9 +2,16 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import * as cron from 'node-cron';
 import { ScraperService } from './scraper.service';
 import { DatabaseModule } from '../database/database.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    DatabaseModule,
+    CacheModule.register({
+      ttl: 60,
+      max: 100,
+    }),
+  ],
   providers: [ScraperService],
 })
 export class ScraperModule implements OnModuleInit {
